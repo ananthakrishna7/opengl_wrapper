@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from transformations import *
 #TODO: Arcs, Rectangles, Triangles, and scanline for closed shapes
     
@@ -66,6 +67,7 @@ class Circle:
     def __init__(self, centre=Point(0,0), radius=200, filled=False):
         self.centre = centre
         self.radius = radius
+        self.filled = filled
         self.vertices = []
 
     def midpoint(self):
@@ -73,23 +75,43 @@ class Circle:
         x = self.radius
         y = 0
         while x >= y:
-            self.vertices.extend([
-                Point(self.centre.x + x, self.centre.y + y, self.centre.color),
-                Point(self.centre.x + y, self.centre.y + x, self.centre.color),
-                Point(self.centre.x - x, self.centre.y + y, self.centre.color),
-                Point(self.centre.x - y, self.centre.y + x, self.centre.color),
-                Point(self.centre.x + x, self.centre.y - y, self.centre.color),
-                Point(self.centre.x + y, self.centre.y - x, self.centre.color),
-                Point(self.centre.x - x, self.centre.y - y, self.centre.color),
-                Point(self.centre.x - y, self.centre.y - x, self.centre.color),
-            ])
+            if not self.filled:
+                self.vertices.extend([
+                    Point(self.centre.x + x, self.centre.y + y, self.centre.color),
+                    Point(self.centre.x + y, self.centre.y + x, self.centre.color),
+                    Point(self.centre.x - x, self.centre.y + y, self.centre.color),
+                    Point(self.centre.x - y, self.centre.y + x, self.centre.color),
+                    Point(self.centre.x + x, self.centre.y - y, self.centre.color),
+                    Point(self.centre.x + y, self.centre.y - x, self.centre.color),
+                    Point(self.centre.x - x, self.centre.y - y, self.centre.color),
+                    Point(self.centre.x - y, self.centre.y - x, self.centre.color),
+                ])
+            else:
+                self.vertices.extend(
+                    Line(
+                        Point(self.centre.x + x, self.centre.y + y, self.centre.color),
+                        Point(self.centre.x - x, self.centre.y + y, self.centre.color)
+                        ).ls())
+                self.vertices.extend(Line(
+                        Point(self.centre.x + y, self.centre.y + x, self.centre.color),
+                        Point(self.centre.x - y, self.centre.y + x, self.centre.color)
+                        ).ls())
+                self.vertices.extend(Line(
+                        Point(self.centre.x + x, self.centre.y - y, self.centre.color),
+                        Point(self.centre.x - x, self.centre.y - y, self.centre.color)
+                        ).ls())
+                self.vertices.extend(Line(
+                        Point(self.centre.x - y, self.centre.y - x, self.centre.color),
+                        Point(self.centre.x + y, self.centre.y - x, self.centre.color)
+                        ).ls())
+
             y += 1
             t1 = t1 + y
             t2 = t1 - x
             if t2 >= 0:
                 t1 = t2
                 x -= 1
-    
+
     def ls(self):
         if len(self.vertices) == 0:
             self.midpoint()
