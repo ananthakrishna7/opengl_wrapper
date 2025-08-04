@@ -57,3 +57,37 @@ class Line:
     
     def ls(self):
         return self._bressenham()
+    
+
+class Circle:
+    def __init__(self, centre=Point(0,0), radius=200):
+        self.centre = centre
+        self.radius = radius
+        self.vertices = []
+
+    def midpoint(self):
+        t1 = self.radius / 16
+        x = self.radius
+        y = 0
+        while x >= y:
+            self.vertices.extend([
+                Point(self.centre.x + x, self.centre.y + y, self.centre.color),
+                Point(self.centre.x + y, self.centre.y + x, self.centre.color),
+                Point(self.centre.x - x, self.centre.y + y, self.centre.color),
+                Point(self.centre.x - y, self.centre.y + x, self.centre.color),
+                Point(self.centre.x + x, self.centre.y - y, self.centre.color),
+                Point(self.centre.x + y, self.centre.y - x, self.centre.color),
+                Point(self.centre.x - x, self.centre.y - y, self.centre.color),
+                Point(self.centre.x - y, self.centre.y - x, self.centre.color),
+            ])
+            y += 1
+            t1 = t1 + y
+            t2 = t1 - x
+            if t2 >= 0:
+                t1 = t2
+                x -= 1
+    
+    def ls(self):
+        if len(self.vertices) == 0:
+            self.midpoint()
+        return self.vertices
