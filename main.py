@@ -1,8 +1,12 @@
 from window import Window
-from primitives import Point
+from primitives import Point, Line
 from drawing import Drawing
-SCREEN=(800,90) # can make this configurable
+SCREEN = (800, 1000) # can make this configurable
 
-p = Point(400, 45)
-d = Drawing(SCREEN, [p])
-Window(screen=SCREEN)
+x = Line(Point(-400, 0), Point(400, 0))
+y = Line(Point(0, 500), Point(0, -500))
+d = Drawing(SCREEN)
+d.add_shape(y)
+d.add_shape(x)
+
+Window(drawing=d, screen=SCREEN, clearColor=(0,0,0,1))

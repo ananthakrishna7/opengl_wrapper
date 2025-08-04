@@ -28,8 +28,9 @@ class Drawing:
     def __init__(self, screenSize, shapes=[]):
         self.shapes = shapes
         self.screenSize = screenSize
-        self.vertices = 0
+        self.vertices = []
         self.processed_verts = False
+        print(shapes)
 
     def add_shape(self, shape):
         self.shapes.append(shape) # Shape object must have Points
@@ -37,35 +38,51 @@ class Drawing:
     def compute_vertices(self):
         # POINT FORMAT --> x, y, colour info
         for shape in self.shapes:
-            if shape.isinstance(Point): # just add points
-                self.vertices.extend(shape.ls())
+            if isinstance(shape, Point): # just add points
+                if shape.x < self.screenSize[0] and shape.y < self.screenSize[1]:
+                    self.vertices.extend(shape.ls())
                 continue
             points = shape.ls()
             for point in points:
-                self.vertices.extend(point.ls())
+                # clipping
+                if point.x < self.screenSize[0] and point.y < self.screenSize[1]:
+                    self.vertices.extend(point.ls())
+            # print(self.vertices)
 
     def screentoNDC(self): # could do this in shader???
+        w, h = self.screenSize
         for i in range(0, len(self.vertices), 5):
-            self.vertices[i] = self.vertices[i]/self.screenSize[0]
-            self.vertices[i + 1] = self.vertices[i + 1]/self.screenSize[1]
-            # color info
-            self.vertices[i + 2] = self.vertices[i + 2]/256
-            self.vertices[i + 3] = self.vertices[i + 3]/256
-            self.vertices[i + 4] = self.vertices[i + 4]/256
+            # Map origin to center of screen
+            self.vertices[i] = (self.vertices[i]) / (w / 2)
+            self.vertices[i + 1] = (self.vertices[i + 1]) / (h / 2)
+            # color info (divide by 255 for [0,1] range)
+            self.vertices[i + 2] = self.vertices[i + 2] / 255
+            self.vertices[i + 3] = self.vertices[i + 3] / 255
+            self.vertices[i + 4] = self.vertices[i + 4] / 255
+        print('NDC vertices:', self.vertices)
 
-    def ls(self): # SHOULD SETUP VAO!!!!
+    def ls(self):
         if not self.processed_verts:
             self.compute_vertices()
-            # self.screentoNDC() # trying this in shader
-        self.vertices = array(self.vertices, dtype=float32)
-        self.vertex_count = len(self.vertices)
-        self.vao = glGenVertexArrays(1)
+            self.screentoNDC()
+            self.processed_verts = True
+            vertices = array(self.vertices, dtype=float32)
+            self.vertex_count = len(self.vertices) // 5
+            self.vao = glGenVertexArrays(1)
+            glBindVertexArray(self.vao)
+            self.vbo = glGenBuffers(1)
+            glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+            glBufferData(GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW)
+            glEnableVertexAttribArray(0)
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(0))
+            glEnableVertexAttribArray(1)
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(8))
+            glBindBuffer(GL_ARRAY_BUFFER, 0)
+            glBindVertexArray(0)
+        # Bind VAO and draw each frame
         glBindVertexArray(self.vao)
-        self.vbo = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-        glBufferData(GL_ARRAY_BUFFER, self.vertices.nbytes, self.vertices, GL_STATIC_DRAW)
-
-        glEnableVertexAttribArray(0)
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(0))
-        glEnableVertexAttribArray(1)
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(8))
+        glDrawArrays(GL_POINTS, 0, self.vertex_count)
+        err = glGetError()
+        if err != 0:
+            print('OpenGL Error:', err)
+        glBindVertexArray(0)

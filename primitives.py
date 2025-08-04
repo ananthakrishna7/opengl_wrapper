@@ -1,6 +1,6 @@
 import numpy as np
 class Point:
-    def __init__(self, x, y, color=(256, 256, 256)):
+    def __init__(self, x, y, color=(255, 255, 255)):
         self.x = x
         self.y = y
         self.color = color
@@ -32,18 +32,26 @@ class Line:
         p = 2*dy - dx # neg
         x = x1
         y = y1
-        while x <= x2:
-            if p < 0:
-                x += 1
-                p += 2*dy # neg
-            else:
-                x += 1
-                if not neg:
-                    y += 1
+        if x1 != x2:
+            while x <= x2: # need to add a case for lines that go straight up
+                if p < 0:
+                    x += 1
+                    p += 2*dy # neg
                 else:
-                    y -= 1
-                p += 2*dy - 2*dx
-            verts.extend(Point(x, y, self.start.color))
+                    x += 1
+                    if not neg:
+                        y += 1
+                    else:
+                        y -= 1
+                    p += 2*dy - 2*dx
+                verts.append(Point(x, y, self.start.color))
+        else:
+            if y1 > y2:
+                y1, y2 = y2, y1
+                y = y1
+            while y < y2:
+                y += 1
+                verts.append(Point(x, y, self.start.color))
 
         return verts
     

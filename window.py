@@ -2,8 +2,6 @@ import pygame as pg
 from OpenGL.GL import *
 from OpenGL.GL.shaders import compileProgram, compileShader
 
-# === Shaders ===
-
 
 class Window:
     def __init__(self, drawing=None, screen=(800,1000), clearColor=(24.0/255.0, 84.0/255.0, 122.0/255.0, 1.0)):
@@ -24,9 +22,11 @@ class Window:
         void main() {
             // we assume middle of the screen as origin. 
             // SO, the screen extends till half the width and height in every direction
-            vec2 screenDim = vec2""" + str(self.screen) + """;
-            gl_Position = vec4((position - screenDim/2)/(screenDim/2), 0.0, 1.0);
-            vColor = color/256;
+            //vec2 screenDim = vec2""" + str(self.screen) + """;
+            //gl_Position = vec4((position - screenDim/2)/(screenDim/2), 0.0, 1.0);
+            gl_Position = vec4(position, 1.0, 1.0);
+            vColor = color;
+            gl_PointSize = 1.0;
         }
         """
 
@@ -39,8 +39,8 @@ class Window:
         }
         """
 
-        r, g, b, a = clearColor
-        glClearColor(r, g, b, a)
+        # Set background to gray for visibility
+        glClearColor(0.3, 0.3, 0.3, 1.0)
         glEnable(GL_PROGRAM_POINT_SIZE)
         self.shader = self.createShader()
 
@@ -75,6 +75,7 @@ class Window:
             glUseProgram(self.shader)
             if self.drawing == None:
                 pass
+            self.drawing.ls()
             pg.display.flip() # swap buffers ig?
 
             self.clock.tick(60)
