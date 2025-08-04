@@ -1,4 +1,7 @@
 import numpy as np
+from transformations import *
+#TODO: Arcs, Rectangles, Triangles, and scanline for closed shapes
+    
 class Point:
     def __init__(self, x, y, color=(255, 255, 255)):
         self.x = x
@@ -60,7 +63,7 @@ class Line:
     
 
 class Circle:
-    def __init__(self, centre=Point(0,0), radius=200):
+    def __init__(self, centre=Point(0,0), radius=200, filled=False):
         self.centre = centre
         self.radius = radius
         self.vertices = []
