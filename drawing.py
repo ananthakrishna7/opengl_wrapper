@@ -35,17 +35,22 @@ class Drawing:
     def add_shape(self, shape):
         self.shapes.append(shape) # Shape object must have Points
 
+    def updateScreenSize(self, size):
+        self.screenSize = size
+        self.processed_verts = False
+
     def compute_vertices(self):
         # POINT FORMAT --> x, y, colour info
+        self.vertices = []
         for shape in self.shapes:
             if isinstance(shape, Point): # just add points
-                if shape.x < self.screenSize[0] and shape.y < self.screenSize[1]:
+                if shape.x < self.screenSize[0]/2 and shape.y < self.screenSize[1]/2 and shape.x > - self.screenSize[0]/2 and shape.y > -self.screenSize[1]/2:
                     self.vertices.extend(shape.ls())
                 continue
             points = shape.ls()
             for point in points:
                 # clipping
-                if point.x < self.screenSize[0] and point.y < self.screenSize[1]:
+                if point.x < self.screenSize[0]/2 and point.y < self.screenSize[1]/2 and point.x > - self.screenSize[0]/2 and point.y > - self.screenSize[1]/2:
                     self.vertices.extend(point.ls())
             # print(self.vertices)
 
@@ -59,7 +64,7 @@ class Drawing:
             self.vertices[i + 2] = self.vertices[i + 2] / 255
             self.vertices[i + 3] = self.vertices[i + 3] / 255
             self.vertices[i + 4] = self.vertices[i + 4] / 255
-        print('NDC vertices:', self.vertices)
+        # print('NDC vertices:', self.vertices)
 
     def ls(self):
         if not self.processed_verts:

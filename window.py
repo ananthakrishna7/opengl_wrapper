@@ -38,9 +38,8 @@ class Window:
             fragColor = vec4(vColor, 1.0);
         }
         """
-
-        # Set background to gray for visibility
-        glClearColor(0.3, 0.3, 0.3, 1.0)
+        r, g, b, a = clearColor
+        glClearColor(r, g, b, a)
         glEnable(GL_PROGRAM_POINT_SIZE)
         self.shader = self.createShader()
 
@@ -69,6 +68,9 @@ class Window:
             for event in pg.event.get():
                 if event.type == pg.QUIT :
                     running = False
+                if event.type == pg.VIDEORESIZE:
+                    self.screen = event.size
+                    self.drawing.updateScreenSize(self.screen)
             
             glClear(GL_COLOR_BUFFER_BIT)
 

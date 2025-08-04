@@ -9,4 +9,4 @@ d = Drawing(SCREEN)
 d.add_shape(y)
 d.add_shape(x)
 
-Window(drawing=d, screen=SCREEN, clearColor=(0,0,0,1))
+Window(drawing=d, screen=SCREEN)
