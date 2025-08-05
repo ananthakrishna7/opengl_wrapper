@@ -116,3 +116,59 @@ class Circle:
         if len(self.vertices) == 0:
             self.midpoint()
         return self.vertices
+    
+class Arc(Circle):
+    def __init__(self, centre=Point(0, 0), radius=200, filled=False, quadrants=[]):
+        super().__init__(centre, radius, filled)
+        self.quadrants = quadrants
+
+    def ls(self):
+        verts = super().ls()
+        final_verts = []
+        for point in verts:
+            if 1 in self.quadrants:
+                if point.x >= 0 and point.y >= 0:
+                    final_verts.append(point)
+            if 2 in self.quadrants:
+                if point.x < 0 and point.y >= 0:
+                    final_verts.append(point)
+            if 3 in self.quadrants:
+                if point.x < 0 and point.y < 0:
+                    final_verts.append(point)
+            if 4 in self.quadrants:
+                if point.x >= 0 and point.y < 0:
+                    final_verts.append(point)
+        self.vertices = final_verts
+        return self.vertices
+    
+
+#TODO: Implement transformation matrices and add them to all Primitives
+
+def translate(shape, tx, ty):
+    points = shape.ls()
+    translate_mat = np.array([[1, 0, tx],
+                             [0, 1, ty],
+                             [0, 0, 1]])
+    color = points[0].color
+    final = []
+    for point in points:
+        vec = np.array([[point.x], [point.y], [1]])
+        newPoint = translate_mat @ vec
+        final.append(Point(newPoint[0,0], newPoint[1,0], color=color))
+    shape.vertices = final
+    return shape
+
+def reflect_y(shape):
+    points = shape.ls()
+    reflect_mat = np.array([[-1, 0, 0],
+                            [ 0, 1, 0],
+                            [ 0, 0, 1]])
+    color = points[0].color
+    final = []
+    for point in points:
+        vec = np.array([[point.x], [point.y], [1]])
+        newPoint = reflect_mat @ vec
+        final.append(Point(newPoint[0,0], newPoint[1,0], color=color))
+    shape.vertices = final
+    return shape
+
