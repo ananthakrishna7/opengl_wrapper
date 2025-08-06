@@ -19,6 +19,6 @@ An example is present in `main.py`.
 This is how you would draw a shape:
 1. Define it using a primitive like `Line` (or use an algorithm to do it yourself using `Point` objects).
 2. Create a `Drawing`.
-3. Add the shape to the `Drawing`.
+3. Add the shape to the `Drawing`. You could pass `Point` objects to a `Drawing` in a loop if you're drawing your own shape, or find a better way to do it(Implement your own class!).
 4. Pass the `Drawing` to a `Window`
 5. Call the `Window`
