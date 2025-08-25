@@ -141,9 +141,30 @@ class Arc(Circle):
         self.vertices = final_verts
         return self.vertices
     
+class Rectangle:
+    def __init__(self, width=100, height=50, x=0, y=0, filled=False, color=(0, 0, 0)):
+        self.sides = [
+            Line(Point(x - width//2, y + height//2, color), Point(x + width//2, y + height//2, color)),
+            Line(Point(x + width//2, y + height//2, color), Point(x + width//2, y - height//2, color)),
+            Line(Point(x + width//2, y - height//2, color), Point(x - width//2, y - height//2, color)),
+            Line(Point(x - width//2, y - height//2, color), Point(x - width//2, y + height//2, color)),
+        ]
+        self.vertices = []
+        self.filled = filled
 
-#TODO: Implement transformation matrices and add them to all Primitives
-
+    def ls(self):
+        self.vertices = []
+        for side in self.sides:
+            self.vertices.extend(side.ls())
+        if self.filled:
+            y_top = self.sides[0].start.y
+            y_bottom = self.sides[2].start.y
+            x_left = self.sides[0].start.x
+            x_right = self.sides[1].start.x
+            for i in range(min(y_bottom, y_top) + 1, max(y_bottom, y_top)):
+                self.vertices.extend(Line(Point(x_left, i, self.sides[0].start.color), Point(x_right, i, self.sides[0].start.color)).ls())
+        return self.vertices
+    
 def translate(shape, tx, ty):
     points = shape.ls()
     translate_mat = np.array([[1, 0, tx],
